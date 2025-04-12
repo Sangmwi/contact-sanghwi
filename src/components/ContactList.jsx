@@ -1,19 +1,25 @@
-import React from "react";
-import { Typography, List, Box, TextField } from "@mui/material";
-import SearchIcon from '@mui/icons-material/Search';
+import React, { useState } from "react";
+import {
+  Typography,
+  List,
+  Box,
+  TextField,
+  InputAdornment,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import Autocomplete from "@mui/material/Autocomplete";
 import usePhoneBookStore from "@/stores/usePhoneBookStore";
 import ContactItem from "@/components/ContactItem";
-import { useState } from "react";
 
 const ContactList = () => {
-  const {
-    phoneBook,
-    searchPhoneBook,
-    setSearchPhoneBook,
-    clearSearchPhoneBook,
-  } = usePhoneBookStore();
-  const [inputValue, setInputValue] = useState('');
+  const { phoneBook, searchKeyword, setSearchPhoneBook, clearSearchPhoneBook } =
+    usePhoneBookStore();
+  const [inputValue, setInputValue] = useState("");
+
+  const filteredList = searchKeyword
+    ? phoneBook.filter((contact) => contact.name.includes(searchKeyword))
+    : phoneBook;
+
   return (
     <Box
       sx={{
@@ -29,7 +35,10 @@ const ContactList = () => {
         borderRadius: "10px",
       }}
     >
-      <Typography variant="h6" sx={{ marginBottom: "10px" }}>연락처 검색</Typography>
+      <Typography variant="h6" sx={{ marginBottom: "10px" }}>
+        연락처 검색
+      </Typography>
+
       <Autocomplete
         sx={{ width: "90%", margin: "10px auto" }}
         options={phoneBook}
@@ -37,17 +46,13 @@ const ContactList = () => {
         inputValue={inputValue}
         onInputChange={(event, newInputValue) => {
           setInputValue(newInputValue);
+          setSearchPhoneBook(newInputValue); // ✅ 실시간 검색 반영
         }}
         onChange={(event, value) => {
           if (value && typeof value !== "string") {
-            setSearchPhoneBook(value.name); // 항목 선택
+            setSearchPhoneBook(value.name);
           } else if (typeof value === "string") {
-            setSearchPhoneBook(value); // 수동 입력 후 Enter로 선택된 string
-          }
-        }}
-        onKeyDown={(event) => {
-          if (event.key === "Enter") {
-            setSearchPhoneBook(inputValue); // inputValue 기준으로 검색
+            setSearchPhoneBook(value);
           }
         }}
         getOptionLabel={(option) => {
@@ -59,13 +64,32 @@ const ContactList = () => {
             {option.name}
           </li>
         )}
-        renderInput={(params) => <TextField {...params} label="이름 검색" />}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="이름 검색"
+            InputProps={{
+              ...params.InputProps,
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: "gray" }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+        )}
       />
 
-      <List>
-        {(searchPhoneBook || phoneBook).map((contact) => (
-          <ContactItem key={contact.id} contact={contact} />
-        ))}
+      <List sx={{ width: "90%", margin: "10px auto" }}>
+        {filteredList.length > 0 ? (
+          filteredList.map((contact) => (
+            <ContactItem key={contact.id} contact={contact} />
+          ))
+        ) : (
+          <Typography sx={{ mt: 2 }} color="text.secondary">
+            검색 결과가 없습니다
+          </Typography>
+        )}
       </List>
     </Box>
   );
