@@ -46,7 +46,7 @@ const ContactList = () => {
         inputValue={inputValue}
         onInputChange={(event, newInputValue) => {
           setInputValue(newInputValue);
-          setSearchPhoneBook(newInputValue); // ✅ 실시간 검색 반영
+          setSearchPhoneBook(newInputValue); // 
         }}
         onChange={(event, value) => {
           if (value && typeof value !== "string") {
