@@ -7,11 +7,13 @@ import { ThemeProvider } from '@mui/material/styles'
 import '@fontsource/pretendard/400.css'
 import '@fontsource/pretendard/500.css'
 import '@fontsource/pretendard/700.css'
-
+import { BrowserRouter } from 'react-router-dom'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ThemeProvider theme={theme}>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </ThemeProvider>
   </StrictMode>,
 )
